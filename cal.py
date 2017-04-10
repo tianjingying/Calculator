@@ -23,9 +23,21 @@ def init_action(expression):
     print("res: %s"%res)
     return res
 
+def delete_space(expression):
+    res = ""
+    for i in expression:
+        print("i: %s , len: %s"%(i , len(i)))
+        if i == " ":
+            continue
+        res += i
+    pass
+    print("return: %s"%res)
+    return res
+
 if __name__ == "__main__":
     print("main")
     # expression = "1 - 2 * ( (60-30 +(-40/5) * (9-2*5/3 + 7 /3*99/4*2998 +10 * 568/14 )) - (-4*3)/ (16-3*2) )"
-    expression = "10+20"
+    expression = "10 + 20"
+    expression = delete_space(expression)
     exp_list = init_action(expression)
 
