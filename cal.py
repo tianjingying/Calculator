@@ -1,3 +1,5 @@
+import re
+
 def init_action(expression):
     """
     # 初始化表达式
@@ -15,10 +17,14 @@ def init_action(expression):
         # 不是数字，就是符号
             if tag:
                 #遇到符号，且之前有数字
-                res.append(char)
-                char = ""
-                res.append(i)
-                tag = False
+                if i == ".":
+                    # 解决遇到小数的情况
+                    char += i
+                else:
+                    res.append(char)
+                    char = ""
+                    res.append(i)
+                    tag = False
             else:
                 #遇到符号，之前没数字
                 if i == "-":
@@ -99,17 +105,17 @@ def calculate(exp_list):
                 num1 = number_list.pop()
                 opt = opt_list.pop()
                 result = compute(num1, opt, num2)
-                print("result111  : %s"%result)
-                print("num1  : %s" % num1)
-                print("opt  : %s" % opt)
-                print("num2  : %s" % num2)
+                # print("result111  : %s"%result)
+                # print("num1  : %s" % num1)
+                # print("opt  : %s" % opt)
+                # print("num2  : %s" % num2)
                 number_list.append(result)
         else:
             # 是符号
             if len(opt_list) == 0 :
                 opt_list.append(exp)
             else:
-                if priority(exp , opt_list) == "=":
+                if priority(exp , opt_list) == "=" or priority(exp , opt_list) == "<":
                     # 可以计算
                     num1 = 0
                     num2 = 0
@@ -118,7 +124,7 @@ def calculate(exp_list):
                         num2 = number_list.pop()
                         num1 = number_list.pop()
                         result = compute(num1, opt, num2 )
-                        print("result : %s"%result)
+                        # print("result : %s"%result)
                         number_list.append(result)
                         opt_list.append(exp)
                     else:
@@ -127,17 +133,9 @@ def calculate(exp_list):
                 elif  priority(exp , opt_list) == ">":
                     tag = True
                     opt_list.append(exp)
-                elif  priority(exp , opt_list) == "<":
-                    num2 = number_list.pop()
-                    num1 = number_list.pop()
-                    opt = opt_list.pop()
-                    result = compute(num1, opt, num2)
-                    print("result <<: %s" % result)
-                    number_list.append(result)
-                    opt_list.append(exp)
 
-    print("number_list : %s"%number_list)
-    print("opt_list : %s" % opt_list)
+    # print("number_list : %s"%number_list)
+    # print("opt_list : %s" % opt_list)
     if len(number_list) == 2 and len(opt_list) == 1:
         pass
         num2 = number_list.pop()
@@ -148,19 +146,35 @@ def calculate(exp_list):
         print("输入的表达式有误，不能运算")
         return None
 
-
-
 if __name__ == "__main__":
-    print("main")
     # expression = "1 - 2 * ( (60-30 +(-40/5) * (9-2*5/3 + 7 /3*99/4*2998 +10 * 568/14 )) - (-4*3)/ (16-3*2) )"
     # expression = "-1 + 2-3 + 4 + 5+8"
-    expression = "2*2+3*4-22*6+4"
-    expression = delete_space(expression)
-    print("expression : %s"%expression)
-    exp_list = init_action(expression)
-    print("exp_list : %s"%exp_list)
-    cal_result = calculate(exp_list)
-    print("cal_result:%s"%cal_result)
+    # expression = "2*2+3*4-22*6+4"
+    # expression = "2*2+(3*(4-22)*6)*2+(4+5)-4"
+    while True:
+        expression = input("请输入表达式： ").strip()
+        expression = delete_space(expression)
+        # print("expression : %s"%expression)
+        while True:
+            match = re.search(r'\([^()]+\)',expression)
+            if not match:
+                break
+            else:
+                exp = match.group()
+                exp_list = init_action(exp[1:-1])
+                # print("exp_list : %s"%exp_list)
+                cal_result = calculate(exp_list)
+                # print("cal_result:%s"%cal_result)
+                tmp = expression.replace(exp,str(cal_result))
+                expression = tmp
+                # print("expression: %s"%expression)
+
+        # print("expression--22  : %s"%expression)
+
+        exp_list = init_action(expression)
+        # print("exp_list : %s"%exp_list)
+        cal_result = calculate(exp_list)
+        print("计算结果:%s"%cal_result)
 
 
 
